@@ -1,57 +1,87 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
+  <div class="body">
+    <!-- <button @click="getInfo">获取信息</button> -->
+    <el-row>
+    <el-col
+      v-for="(o, index) in info"
+      :key="index"
+      :span="8"
+      :offset="index > 0 ? 2 : 0"
+    >
+      <el-card :body-style="{ padding: '0px' }">
+        <img
+          :src="o.src"
+          class="image"
+        />
+        <div style="padding: 14px">
+          <span>{{o.title}}</span>
+          <div class="bottom">
+            <time class="time">{{o.time}}</time>
+          </div>
+        </div>
+      </el-card>
+    </el-col>
+  </el-row>
   </div>
 </template>
 
 <script>
+  import axios from 'axios'
+  import {reactive} from 'vue'
 export default {
-  name: 'HelloWorld',
-  props: {
-    msg: String
+  
+  setup(){
+    const info = reactive([])
+    function getInfo(){
+    // console.log(amountOne.value)
+    axios({
+      method:"get",
+      url:"http://192.168.137.1:8088/api/school/page",
+      params:{
+        CurrentPage:1,
+        PageSize:5
+      }
+    }).then((res)=>{
+     const data = res.data.data.records
+     data.forEach(array => {
+       info.push(array)
+     });
+      console.log(data)
+    })
+  }
+  return{
+    getInfo,
+    info
+  }
+  },
+  mounted(){
+    this.getInfo()
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h3 {
-  margin: 40px 0 0;
+.bottom {
+  margin-top: 13px;
+  line-height: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
-ul {
-  list-style-type: none;
+
+.button {
   padding: 0;
+  min-height: auto;
 }
-li {
-  display: inline-block;
-  margin: 0 10px;
+
+.image {
+  width: 100%;
+  display: block;
 }
-a {
-  color: #42b983;
+
+.time {
+  font-size: 12px;
+  color: #999;
 }
 </style>
